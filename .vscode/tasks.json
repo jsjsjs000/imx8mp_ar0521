@@ -40,22 +40,37 @@
 			"dependsOn": ["build"],
 		},
 			/* Configure Build Task */
+			/* Default not cross-compile make */
 		{
 			"label": "build",
 			"type": "shell",
-        /* Default not cross-compile make */
-			//"command": "mkdir -p ${config:BUILD_PATH}; make clean; make -j$(nproc) && scp ${config:BUILD_PATH}/${config:PROGRAM} root@${config:TARGET_IP}:${config:REMOTE_DIR} && ssh root@${config:TARGET_IP} ${config:REMOTE_DIR}/${config:PROGRAM}",
-
-        /* Cross-compile only */
-      "command": "source ${config:YOCTO_ENVIRONMENT}; set sysroot ${config:SDKTARGETSYSROOT}; make -j $(nproc)",
-
-        /* Cross-compile and upload to i.MX */
-      // "command": "source ${config:YOCTO_ENVIRONMENT}; set sysroot ${config:SDKTARGETSYSROOT}; make -j $(nproc); scp ${config:PROGRAM} {$config:REMOTE_USER}@${config:TARGET_IP}:${config:REMOTE_DIR}",
-
-      "problemMatcher": ["$gcc"],
-      "group": {
+			"command": "mkdir -p ${config:BUILD_PATH}; make clean; make -j$(nproc) && scp ${config:BUILD_PATH}/${config:PROGRAM} root@${config:TARGET_IP}:${config:REMOTE_DIR} && ssh root@${config:TARGET_IP} ${config:REMOTE_DIR}/${config:PROGRAM}",
+			"problemMatcher": ["$gcc"],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		},
+			/* Cross-compile for i.MX */
+		{
+			"label": "cross-compile-i.MX",
+			"type": "shell",
+			"command": "source ${config:YOCTO_ENVIRONMENT}; set sysroot ${config:SDKTARGETSYSROOT}; make -j $(nproc)",
+			"problemMatcher": ["$gcc"],
+			"group": {
 				"kind": "build",
 				"isDefault": true
+			}
+		},
+			/* Cross-compile and upload to i.MX */
+		{
+			"label": "cross-compile-and-upload-to-i.MX",
+			"type": "shell",
+			"command": "source ${config:YOCTO_ENVIRONMENT}; set sysroot ${config:SDKTARGETSYSROOT}; make -j $(nproc); scp ${config:PROGRAM} {$config:REMOTE_USER}@${config:TARGET_IP}:${config:REMOTE_DIR}",
+			"problemMatcher": ["$gcc"],
+			"group": {
+				"kind": "build",
+				"isDefault": false
 			}
 		},
 	]
