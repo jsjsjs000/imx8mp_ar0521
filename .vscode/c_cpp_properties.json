@@ -1,0 +1,20 @@
+{
+	"configurations": [
+		{
+			"name": "Linux",
+			"includePath": [
+				"${workspaceFolder}/**",
+				"/opt/ampliphy-vendor-xwayland/BSP-Yocto-NXP-i.MX8MP-PD23.1.0/sysroots/cortexa53-crypto-phytec-linux/usr/include/**",
+				"/opt/ampliphy-vendor-xwayland/BSP-Yocto-NXP-i.MX8MP-PD23.1.0/sysroots/cortexa53-crypto-phytec-linux/lib/modules/5.15.71-bsp-yocto-nxp-i.mx8mp-pd23.1.0/build/include/**"
+			],
+			// "defines": [],
+			// "compilerPath": "/usr/bin/gcc",
+			// "cStandard": "c17",
+			// "cppStandard": "gnu++14",
+			// "intelliSenseMode": "clang-arm64",
+			// "intelliSenseMode": "linux-gcc-x64",
+			"configurationProvider": "includePath"
+		}
+	],
+	"version": 4
+}
