@@ -1,0 +1,19 @@
+{
+  /* Target Device Settings */
+"TARGET_IP": "192.168.3.11",
+"REMOTE_USER": "root",
+"REMOTE_DIR": "/lib/modules/5.15.71-bsp-yocto-nxp-i.mx8mp-pd23.1.0/kernel/drivers/media/i2c/",
+"BUILD_PATH": "build",
+"PROGRAM": "ar0521.ko",
+
+  /* Yocto SDK Configuration */
+"ARCH": "aarch64-phytec-linux",
+"OECORE_NATIVE_SYSROOT": "/opt/ampliphy-vendor-xwayland/BSP-Yocto-NXP-i.MX8MP-PD23.1.0/sysroots/x86_64-phytecsdk-linux",
+"SDKTARGETSYSROOT": "/opt/ampliphy-vendor-xwayland/BSP-Yocto-NXP-i.MX8MP-PD23.1.0/sysroots/cortexa53-crypto-phytec-linux",
+"YOCTO_ENVIRONMENT": "/opt/ampliphy-vendor-xwayland/BSP-Yocto-NXP-i.MX8MP-PD23.1.0/environment-setup-cortexa53-crypto-phytec-linux",
+
+  /* Yocto SDK Constants */
+"CC_PREFIX": "${config:OECORE_NATIVE_SYSROOT}/usr/bin/${config:ARCH}/${config:ARCH}-",
+"CXX": "${config:CC_PREFIX}g++ --sysroot=${config:SDKTARGETSYSROOT}",
+"CC": "${config:CC_PREFIX}gcc --sysroot=${config:SDKTARGETSYSROOT}",
+}
