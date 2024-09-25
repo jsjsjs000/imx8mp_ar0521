@@ -3555,3 +3555,11 @@ module_i2c_driver(ar0521_i2c_driver);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Stefan Riedmueller <s.riedmueller@phytec.de>");
+
+/*
+
+dev_dbg(
+dev_warn(
+dev_err(
+
+*/
