@@ -66,7 +66,7 @@
 		{
 			"label": "cross-compile-and-upload-to-i.MX",
 			"type": "shell",
-			"command": "source ${config:YOCTO_ENVIRONMENT}; set sysroot ${config:SDKTARGETSYSROOT}; make -j $(nproc); scp ${config:PROGRAM} {$config:REMOTE_USER}@${config:TARGET_IP}:${config:REMOTE_DIR}",
+			"command": "source ${config:YOCTO_ENVIRONMENT}; set sysroot ${config:SDKTARGETSYSROOT}; make -j $(nproc) && scp ${config:PROGRAM} ${config:REMOTE_USER}@${config:TARGET_IP}:${config:REMOTE_DIR}",
 			"problemMatcher": ["$gcc"],
 			"group": {
 				"kind": "build",
