@@ -4,7 +4,8 @@
 "REMOTE_USER": "root",
 "REMOTE_DIR": "/lib/modules/5.15.71-bsp-yocto-nxp-i.mx8mp-pd23.1.0/kernel/drivers/media/i2c/",
 "BUILD_PATH": "build",
-"PROGRAM": "ar0521.ko",
+// "PROGRAM": "ar0521.ko",
+"PROGRAM": "ar5.ko",
 
   /* Yocto SDK Configuration */
 "ARCH": "aarch64-phytec-linux",
@@ -16,4 +17,10 @@
 "CC_PREFIX": "${config:OECORE_NATIVE_SYSROOT}/usr/bin/${config:ARCH}/${config:ARCH}-",
 "CXX": "${config:CC_PREFIX}g++ --sysroot=${config:SDKTARGETSYSROOT}",
 "CC": "${config:CC_PREFIX}gcc --sysroot=${config:SDKTARGETSYSROOT}",
+"files.associations": {
+  "v4l2-ctrls.h": "c",
+  "consumer.h": "c",
+  "v4l2-async.h": "c",
+  "delay.h": "c"
+},
 }

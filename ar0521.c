@@ -3527,17 +3527,19 @@ static int ar0521_remove(struct i2c_client *i2c)
 }
 
 static const struct i2c_device_id ar0521_id_table[] = {
-	{ "ar0521", AR0521_MODEL_UNKNOWN },
-	{ "ar0521c", AR0521_MODEL_COLOR },
-	{ "ar0521m", AR0521_MODEL_MONOCHROME },
+	{ "ar5", AR0521_MODEL_MONOCHROME },
+	// { "ar0521", AR0521_MODEL_UNKNOWN },
+	// { "ar0521c", AR0521_MODEL_COLOR },
+	// { "ar0521m", AR0521_MODEL_MONOCHROME },
 	{ /* sentinel */ }
 };
 MODULE_DEVICE_TABLE(i2c, ar0521_id_table);
 
 static const struct of_device_id ar0521_of_match[] = {
-	{ .compatible = "onsemi,ar0521" },
-	{ .compatible = "onsemi,ar0521c" },
-	{ .compatible = "onsemi,ar0521m" },
+	{ .compatible = "onsemi,ar5" },
+	// { .compatible = "onsemi,ar0521" },
+	// { .compatible = "onsemi,ar0521c" },
+	// { .compatible = "onsemi,ar0521m" },
 	{ /* sentinel */ }
 };
 MODULE_DEVICE_TABLE(of, ar0521_of_match);
