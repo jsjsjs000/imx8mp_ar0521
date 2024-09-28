@@ -479,6 +479,7 @@ static int ar0521_set_fmt(struct v4l2_subdev *sd,
 
 		mutex_unlock(&sensor->lock);
 
+pr_info("----------------------- set_fmt 1");
 		return 0;
 	}
 
@@ -495,12 +496,18 @@ static int ar0521_set_fmt(struct v4l2_subdev *sd,
 				       max_hblank, sensor->ctrls.hblank->step,
 				       sensor->ctrls.hblank->minimum);
 	if (ret)
+	{
+pr_info("----------------------- set_fmt 2");
 		goto unlock;
+	}
 
 	ret = __v4l2_ctrl_s_ctrl(sensor->ctrls.hblank,
 				 sensor->ctrls.hblank->minimum);
 	if (ret)
+	{
+pr_info("----------------------- set_fmt 3");
 		goto unlock;
+	}
 
 	max_vblank = AR0521_TOTAL_HEIGHT_MAX - sensor->fmt.height;
 	ret = __v4l2_ctrl_modify_range(sensor->ctrls.vblank,
@@ -508,19 +515,30 @@ static int ar0521_set_fmt(struct v4l2_subdev *sd,
 				       max_vblank, sensor->ctrls.vblank->step,
 				       sensor->ctrls.vblank->minimum);
 	if (ret)
+	{
+pr_info("----------------------- set_fmt 4");
 		goto unlock;
+	}
 
 	ret = __v4l2_ctrl_s_ctrl(sensor->ctrls.vblank,
 				 sensor->ctrls.vblank->minimum);
 	if (ret)
+	{
+pr_info("----------------------- set_fmt 5");
 		goto unlock;
+	}
 
 	exposure_max = sensor->fmt.height + AR0521_HEIGHT_BLANKING_MIN - 4;
+pr_info("----------------------- set_fmt   exposure_max = %d, min = %d, step = %d, exposure_default = %d",
+		exposure_max, sensor->ctrls.exposure->minimum, sensor->ctrls.exposure->step,
+		sensor->ctrls.exposure->default_value);
 	ret = __v4l2_ctrl_modify_range(sensor->ctrls.exposure,
 				       sensor->ctrls.exposure->minimum,
 				       exposure_max,
 				       sensor->ctrls.exposure->step,
 				       sensor->ctrls.exposure->default_value);
+pr_info("----------------------- set_fmt 6 = %d", ret);
+ret=0;//$$
 unlock:
 	mutex_unlock(&sensor->lock);
 
@@ -1201,7 +1219,7 @@ MODULE_DEVICE_TABLE(of, ar0521_dt_ids);
 
 static struct i2c_driver ar0521_i2c_driver = {
 	.driver = {
-		.name  = "ar0521",
+		.name  = "ar5",
 		.pm = &ar0521_pm_ops,
 		.of_match_table = ar0521_dt_ids,
 	},
