@@ -19,8 +19,9 @@
 #define AR0521_WIDTH_MAX		640u
 #define AR0521_HEIGHT_MIN		64u
 #define AR0521_HEIGHT_MAX		480u
-#define AR0521_FORMAT       MEDIA_BUS_FMT_RGB888_1X24
-// #define AR0521_FORMAT       MEDIA_BUS_FMT_Y8_1X8
+
+// #define AR0521_FORMAT       MEDIA_BUS_FMT_RGB888_1X24
+#define AR0521_FORMAT       MEDIA_BUS_FMT_Y8_1X8
 
 #define AR0521_WIDTH_BLANKING_MIN	572u
 #define AR0521_HEIGHT_BLANKING_MIN	38u /* must be even */
@@ -33,12 +34,6 @@
 #define AR0521_ANA_GAIN_DEFAULT		0x00
 
 #define be		cpu_to_be16
-
-static const char * const ar0521_supply_names[] = {
-	"vdd_io",	/* I/O (1.8V) supply */
-	"vdd",		/* Core, PLL and MIPI (1.2V) supply */
-	"vaa",		/* Analog (2.7V) supply */
-};
 
 static const s64 ar0521_link_frequencies[] = {
 	184000000,
@@ -67,7 +62,6 @@ struct ar0521_dev {
 	struct clk *extclk;
 	u32 extclk_freq;
 
-	struct regulator *supplies[ARRAY_SIZE(ar0521_supply_names)];
 	struct gpio_desc *reset_gpio;
 
 	/* lock to protect all members below */
@@ -98,53 +92,6 @@ static inline struct v4l2_subdev *ctrl_to_sd(struct v4l2_ctrl *ctrl)
 			     ctrls.handler)->sd;
 }
 
-static int ar0521_set_geometry(struct ar0521_dev *sensor)
-{
-	/* Center the image in the visible output window. */
-	// u16 x = clamp((AR0521_WIDTH_MAX - sensor->fmt.width) / 2,
-	// 	       AR0521_MIN_X_ADDR_START, AR0521_MAX_X_ADDR_END);
-	// u16 y = clamp(((AR0521_HEIGHT_MAX - sensor->fmt.height) / 2) & ~1,
-	// 	       AR0521_MIN_Y_ADDR_START, AR0521_MAX_Y_ADDR_END);
-
-	/* All dimensions are unsigned 12-bit integers */
-	// __be16 regs[] = {
-	// 	be(AR0521_REG_FRAME_LENGTH_LINES),
-	// 	be(sensor->fmt.height + sensor->ctrls.vblank->val),
-	// 	be(sensor->fmt.width + sensor->ctrls.hblank->val),
-	// 	be(x),
-	// 	be(y),
-	// 	be(x + sensor->fmt.width - 1),
-	// 	be(y + sensor->fmt.height - 1),
-	// 	be(sensor->fmt.width),
-	// 	be(sensor->fmt.height)
-	// };
-
-	// return ar0521_write_regs(sensor, regs, ARRAY_SIZE(regs));
-  return 0;
-}
-
-static int ar0521_set_gains(struct ar0521_dev *sensor)
-{
-	// int green = sensor->ctrls.gain->val;
-	// int red = max(green + sensor->ctrls.red_balance->val, 0);
-	// int blue = max(green + sensor->ctrls.blue_balance->val, 0);
-	// unsigned int gain = min(red, min(green, blue));
-	// unsigned int analog = min(gain, 64u); /* range is 0 - 127 */
-	// __be16 regs[5];
-
-	// red   = min(red   - analog + 64, 511u);
-	// green = min(green - analog + 64, 511u);
-	// blue  = min(blue  - analog + 64, 511u);
-	// regs[0] = be(AR0521_REG_GREEN1_GAIN);
-	// regs[1] = be(green << 7 | analog);
-	// regs[2] = be(blue  << 7 | analog);
-	// regs[3] = be(red   << 7 | analog);
-	// regs[4] = be(green << 7 | analog);
-
-	// return ar0521_write_regs(sensor, regs, ARRAY_SIZE(regs));
-  return 0;
-}
-
 static int ar0521_set_stream(struct ar0521_dev *sensor, bool on)
 {
 	int ret;
@@ -154,32 +101,9 @@ static int ar0521_set_stream(struct ar0521_dev *sensor, bool on)
 		if (ret < 0)
 			return ret;
 
-		/* Stop streaming for just a moment */
-		// ret = ar0521_write_reg(sensor, AR0521_REG_RESET,
-		// 		       AR0521_REG_RESET_DEFAULTS);
-		// if (ret)
-		// 	return ret;
-
-		ret = ar0521_set_geometry(sensor);
-		if (ret)
-			return ret;
-
 		ret =  __v4l2_ctrl_handler_setup(&sensor->ctrls.handler);
 		if (ret)
 			goto err;
-
-		/* Exit LP-11 mode on clock and data lanes */
-		// ret = ar0521_write_reg(sensor, AR0521_REG_HISPI_CONTROL_STATUS,
-		// 		       0);
-		// if (ret)
-		// 	goto err;
-
-		// /* Start streaming */
-		// ret = ar0521_write_reg(sensor, AR0521_REG_RESET,
-		// 		       AR0521_REG_RESET_DEFAULTS |
-		// 		       AR0521_REG_RESET_STREAM);
-		// if (ret)
-		// 	goto err;
 
 		return 0;
 
@@ -192,15 +116,6 @@ err:
 		 * Reset gain, the sensor may produce all white pixels without
 		 * this
 		 */
-		// ret = ar0521_write_reg(sensor, AR0521_REG_GLOBAL_GAIN, 0x2000);
-		// if (ret)
-		// 	return ret;
-
-		// /* Stop streaming */
-		// ret = ar0521_write_reg(sensor, AR0521_REG_RESET,
-		// 		       AR0521_REG_RESET_DEFAULTS);
-		// if (ret)
-		// 	return ret;
 
 		pm_runtime_put(&sensor->i2c_client->dev);
 		return 0;
@@ -354,25 +269,12 @@ static int ar0521_s_ctrl(struct v4l2_ctrl *ctrl)
 	switch (ctrl->id) {
 	case V4L2_CID_HBLANK:
 	case V4L2_CID_VBLANK:
-		ret = ar0521_set_geometry(sensor);
-		break;
 	case V4L2_CID_ANALOGUE_GAIN:
-		// ret = ar0521_write_reg(sensor, AR0521_REG_ANA_GAIN_CODE_GLOBAL,
-		// 		       ctrl->val);
-		break;
 	case V4L2_CID_GAIN:
 	case V4L2_CID_RED_BALANCE:
 	case V4L2_CID_BLUE_BALANCE:
-		ret = ar0521_set_gains(sensor);
-		break;
 	case V4L2_CID_EXPOSURE:
-		// ret = ar0521_write_reg(sensor,
-		// 		       AR0521_REG_COARSE_INTEGRATION_TIME,
-				      //  ctrl->val);
-		break;
 	case V4L2_CID_TEST_PATTERN:
-		// ret = ar0521_write_reg(sensor, AR0521_REG_TEST_PATTERN_MODE,
-		// 		       ctrl->val);
 		break;
 	default:
 		dev_err(&sensor->i2c_client->dev,
@@ -479,17 +381,12 @@ static int ar0521_power_off(struct device *dev)
 {
 	struct v4l2_subdev *sd = dev_get_drvdata(dev);
 	struct ar0521_dev *sensor = to_ar0521_dev(sd);
-	// int i;
 
 	// clk_disable_unprepare(sensor->extclk);
 
 	if (sensor->reset_gpio)
 		gpiod_set_value(sensor->reset_gpio, 1); /* assert RESET signal */
 
-	// for (i = ARRAY_SIZE(ar0521_supply_names) - 1; i >= 0; i--) {
-	// 	if (sensor->supplies[i])
-	// 		regulator_disable(sensor->supplies[i]);
-	// }
 	return 0;
 }
 
