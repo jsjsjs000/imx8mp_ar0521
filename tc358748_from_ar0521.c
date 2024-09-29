@@ -101,15 +101,15 @@ static int ar0521_set_stream(struct ar0521_dev *sensor, bool on)
 		if (ret < 0)
 			return ret;
 
-		ret =  __v4l2_ctrl_handler_setup(&sensor->ctrls.handler);
-		if (ret)
-			goto err;
+		// ret =  __v4l2_ctrl_handler_setup(&sensor->ctrls.handler);
+		// if (ret)
+		// 	goto err;
 
 		return 0;
 
-err:
-		pm_runtime_put(&sensor->i2c_client->dev);
-		return ret;
+// err:
+// 		pm_runtime_put(&sensor->i2c_client->dev);
+// 		return ret;
 
 	} else {
 		/*
@@ -124,6 +124,7 @@ err:
 
 static void ar0521_adj_fmt(struct v4l2_mbus_framefmt *fmt)
 {
+pr_info("----------------------- adj_fmt 1");
 	fmt->width = clamp(ALIGN(fmt->width, 4), AR0521_WIDTH_MIN,
 			   AR0521_WIDTH_MAX);
 	fmt->height = clamp(ALIGN(fmt->height, 4), AR0521_HEIGHT_MIN,
@@ -134,6 +135,7 @@ static void ar0521_adj_fmt(struct v4l2_mbus_framefmt *fmt)
 	fmt->ycbcr_enc = V4L2_YCBCR_ENC_DEFAULT;
 	fmt->quantization = V4L2_QUANTIZATION_FULL_RANGE;
 	fmt->xfer_func = V4L2_XFER_FUNC_DEFAULT;
+pr_info("----------------------- adj_fmt %d %d 0x%04x", fmt->width, fmt->height, fmt->code);
 }
 
 static int ar0521_get_fmt(struct v4l2_subdev *sd,
@@ -162,8 +164,7 @@ static int ar0521_set_fmt(struct v4l2_subdev *sd,
 			  struct v4l2_subdev_format *format)
 {
 	struct ar0521_dev *sensor = to_ar0521_dev(sd);
-	int max_vblank, max_hblank;
-  // int exposure_max;
+	// int max_vblank, max_hblank;
 	int ret;
 
 	ar0521_adj_fmt(&format->format);
@@ -178,7 +179,7 @@ static int ar0521_set_fmt(struct v4l2_subdev *sd,
 
 		mutex_unlock(&sensor->lock);
 
-// pr_info("----------------------- set_fmt 1");
+pr_info("----------------------- set_fmt 1");
 		return 0;
 	}
 
@@ -188,43 +189,43 @@ static int ar0521_set_fmt(struct v4l2_subdev *sd,
 	 * Update the exposure and blankings limits. Blankings are also reset
 	 * to the minimum.
 	 */
-	max_hblank = AR0521_TOTAL_WIDTH_MAX - sensor->fmt.width;
-	ret = __v4l2_ctrl_modify_range(sensor->ctrls.hblank,
-				       sensor->ctrls.hblank->minimum,
-				       max_hblank, sensor->ctrls.hblank->step,
-				       sensor->ctrls.hblank->minimum);
-	if (ret)
-	{
+	// max_hblank = AR0521_TOTAL_WIDTH_MAX - sensor->fmt.width;
+	// ret = __v4l2_ctrl_modify_range(sensor->ctrls.hblank,
+	// 			       sensor->ctrls.hblank->minimum,
+	// 			       max_hblank, sensor->ctrls.hblank->step,
+	// 			       sensor->ctrls.hblank->minimum);
+// 	if (ret)
+// 	{
 // pr_info("----------------------- set_fmt 2");
-		goto unlock;
-	}
+// 		goto unlock;
+// 	}
 
-	ret = __v4l2_ctrl_s_ctrl(sensor->ctrls.hblank,
-				 sensor->ctrls.hblank->minimum);
-	if (ret)
-	{
+// 	ret = __v4l2_ctrl_s_ctrl(sensor->ctrls.hblank,
+// 				 sensor->ctrls.hblank->minimum);
+// 	if (ret)
+// 	{
 // pr_info("----------------------- set_fmt 3");
-		goto unlock;
-	}
+// 		goto unlock;
+// 	}
 
-	max_vblank = AR0521_TOTAL_HEIGHT_MAX - sensor->fmt.height;
-	ret = __v4l2_ctrl_modify_range(sensor->ctrls.vblank,
-				       sensor->ctrls.vblank->minimum,
-				       max_vblank, sensor->ctrls.vblank->step,
-				       sensor->ctrls.vblank->minimum);
-	if (ret)
-	{
+// 	max_vblank = AR0521_TOTAL_HEIGHT_MAX - sensor->fmt.height;
+// 	ret = __v4l2_ctrl_modify_range(sensor->ctrls.vblank,
+// 				       sensor->ctrls.vblank->minimum,
+// 				       max_vblank, sensor->ctrls.vblank->step,
+// 				       sensor->ctrls.vblank->minimum);
+// 	if (ret)
+// 	{
 // pr_info("----------------------- set_fmt 4");
-		goto unlock;
-	}
+// 		goto unlock;
+// 	}
 
-	ret = __v4l2_ctrl_s_ctrl(sensor->ctrls.vblank,
-				 sensor->ctrls.vblank->minimum);
-	if (ret)
-	{
+// 	ret = __v4l2_ctrl_s_ctrl(sensor->ctrls.vblank,
+// 				 sensor->ctrls.vblank->minimum);
+// 	if (ret)
+// 	{
 // pr_info("----------------------- set_fmt 5");
-		goto unlock;
-	}
+// 		goto unlock;
+// 	}
 
 	// exposure_max = sensor->fmt.height + AR0521_HEIGHT_BLANKING_MIN - 4;
 // pr_info("----------------------- set_fmt   exposure_max = %d, min = %d, step = %d, exposure_default = %d",
@@ -235,9 +236,9 @@ static int ar0521_set_fmt(struct v4l2_subdev *sd,
 // 				       exposure_max,
 // 				       sensor->ctrls.exposure->step,
 // 				       sensor->ctrls.exposure->default_value);
-// pr_info("----------------------- set_fmt 6 = %d", ret);
+pr_info("----------------------- set_fmt 6 = %d", ret);
 ret=0;//$$
-unlock:
+// unlock:
 	mutex_unlock(&sensor->lock);
 
 	return ret;
@@ -247,19 +248,20 @@ static int ar0521_s_ctrl(struct v4l2_ctrl *ctrl)
 {
 	struct v4l2_subdev *sd = ctrl_to_sd(ctrl);
 	struct ar0521_dev *sensor = to_ar0521_dev(sd);
-	int exp_max;
+	// int exp_max;
 	int ret;
 
 	/* v4l2_ctrl_lock() locks our own mutex */
+pr_info("----------------------- s_ctrl id %x", ctrl->id);
 
 	switch (ctrl->id) {
-	case V4L2_CID_VBLANK:
-		exp_max = sensor->fmt.height + ctrl->val - 4;
-		__v4l2_ctrl_modify_range(sensor->ctrls.exposure,
-					 sensor->ctrls.exposure->minimum,
-					 exp_max, sensor->ctrls.exposure->step,
-					 sensor->ctrls.exposure->default_value);
-		break;
+		case V4L2_CID_VBLANK:
+			// exp_max = sensor->fmt.height + ctrl->val - 4;
+			// __v4l2_ctrl_modify_range(sensor->ctrls.exposure,
+			// 			sensor->ctrls.exposure->minimum,
+			// 			exp_max, sensor->ctrls.exposure->step,
+			// 			sensor->ctrls.exposure->default_value);
+			break;
 	}
 
 	/* access the sensor only if it's powered up */
@@ -267,20 +269,20 @@ static int ar0521_s_ctrl(struct v4l2_ctrl *ctrl)
 		return 0;
 
 	switch (ctrl->id) {
-	case V4L2_CID_HBLANK:
-	case V4L2_CID_VBLANK:
-	case V4L2_CID_ANALOGUE_GAIN:
-	case V4L2_CID_GAIN:
-	case V4L2_CID_RED_BALANCE:
-	case V4L2_CID_BLUE_BALANCE:
-	case V4L2_CID_EXPOSURE:
-	case V4L2_CID_TEST_PATTERN:
-		break;
-	default:
-		dev_err(&sensor->i2c_client->dev,
-			"Unsupported control %x\n", ctrl->id);
-		ret = -EINVAL;
-		break;
+		case V4L2_CID_HBLANK:
+		case V4L2_CID_VBLANK:
+		case V4L2_CID_ANALOGUE_GAIN:
+		case V4L2_CID_GAIN:
+		case V4L2_CID_RED_BALANCE:
+		case V4L2_CID_BLUE_BALANCE:
+		case V4L2_CID_EXPOSURE:
+		case V4L2_CID_TEST_PATTERN:
+			break;
+		default:
+			dev_err(&sensor->i2c_client->dev,
+				"Unsupported control %x\n", ctrl->id);
+			ret = -EINVAL;
+			break;
 	}
 
 	pm_runtime_put(&sensor->i2c_client->dev);
@@ -289,13 +291,6 @@ static int ar0521_s_ctrl(struct v4l2_ctrl *ctrl)
 
 static const struct v4l2_ctrl_ops ar0521_ctrl_ops = {
 	.s_ctrl = ar0521_s_ctrl,
-};
-
-static const char * const test_pattern_menu[] = {
-	"Disabled",
-	"Solid color",
-	"Color bars",
-	"Faded color bars"
 };
 
 static int ar0521_init_controls(struct ar0521_dev *sensor)
@@ -356,10 +351,10 @@ static int ar0521_init_controls(struct ar0521_dev *sensor)
 	if (link_freq)
 		link_freq->flags |= V4L2_CTRL_FLAG_READ_ONLY;
 
-	ctrls->test_pattern = v4l2_ctrl_new_std_menu_items(hdl, ops,
-					V4L2_CID_TEST_PATTERN,
-					ARRAY_SIZE(test_pattern_menu) - 1,
-					0, 0, test_pattern_menu);
+	// ctrls->test_pattern = v4l2_ctrl_new_std_menu_items(hdl, ops,
+	// 				V4L2_CID_TEST_PATTERN,
+	// 				ARRAY_SIZE(test_pattern_menu) - 1,
+	// 				0, 0, test_pattern_menu);
 
 	if (hdl->error) {
 		ret = hdl->error;

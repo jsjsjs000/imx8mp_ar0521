@@ -262,7 +262,6 @@ static bool tc358748_set_pll(void)
 bool tc358748_setup(struct i2c_client *client)
 {
 	UNUSED const u16 width = 640;
-// UNUSED const u16 width = 320;
 	UNUSED const u16 height = 480;
 	UNUSED const u16 total_width = 800;
 	UNUSED const u16 total_height = 525;
@@ -415,7 +414,7 @@ bool tc358748_setup(struct i2c_client *client)
 // return true;
 
 		/* FIFOCTL - FiFo level */
-	fifoctl = 1; // 12 RGB888 ;//16;  // $$
+	fifoctl = 16; // 12 RGB888 ;//16;  // $$
 	// fifoctl = 16; // 12 RGB888 ;//16;  // $$
 // fifoctl = 0x20; // for YUV422 $$
 	if (!i2c_write_reg16(tc358748_i2c_client, FIFOCTL, fifoctl))
