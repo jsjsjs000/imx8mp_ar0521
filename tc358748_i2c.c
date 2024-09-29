@@ -415,7 +415,7 @@ bool tc358748_setup(struct i2c_client *client)
 // return true;
 
 		/* FIFOCTL - FiFo level */
-	fifoctl = 16; // 12 RGB888 ;//16;  // $$
+	fifoctl = 1; // 12 RGB888 ;//16;  // $$
 	// fifoctl = 16; // 12 RGB888 ;//16;  // $$
 // fifoctl = 0x20; // for YUV422 $$
 	if (!i2c_write_reg16(tc358748_i2c_client, FIFOCTL, fifoctl))

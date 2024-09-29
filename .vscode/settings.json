@@ -21,6 +21,7 @@
   "v4l2-ctrls.h": "c",
   "consumer.h": "c",
   "v4l2-async.h": "c",
-  "delay.h": "c"
+  "delay.h": "c",
+  "platform_device.h": "c"
 },
 }

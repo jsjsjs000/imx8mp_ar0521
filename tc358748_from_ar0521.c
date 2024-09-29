@@ -15,30 +15,12 @@
 
 #include "tc358748_i2c.h"
 
-/* External clock (extclk) frequencies */
-#define AR0521_EXTCLK_MIN		(10 * 1000 * 1000)
-#define AR0521_EXTCLK_MAX		(48 * 1000 * 1000)
-
-/* PLL and PLL2 */
-#define AR0521_PLL_MIN			(320 * 1000 * 1000)
-#define AR0521_PLL_MAX			(1280 * 1000 * 1000)
-
-/* Effective pixel sample rate on the pixel array. */
-#define AR0521_PIXEL_CLOCK_RATE		(184 * 1000 * 1000)
-#define AR0521_PIXEL_CLOCK_MIN		(168 * 1000 * 1000)
-#define AR0521_PIXEL_CLOCK_MAX		(414 * 1000 * 1000)
-
-#define AR0521_NATIVE_WIDTH		2604u
-#define AR0521_NATIVE_HEIGHT		1964u
-#define AR0521_MIN_X_ADDR_START		0u
-#define AR0521_MIN_Y_ADDR_START		0u
-#define AR0521_MAX_X_ADDR_END		2603u
-#define AR0521_MAX_Y_ADDR_END		1955u
-
-#define AR0521_WIDTH_MIN		8u
-#define AR0521_WIDTH_MAX		2592u
-#define AR0521_HEIGHT_MIN		8u
-#define AR0521_HEIGHT_MAX		1944u
+#define AR0521_WIDTH_MIN		64u
+#define AR0521_WIDTH_MAX		640u
+#define AR0521_HEIGHT_MIN		64u
+#define AR0521_HEIGHT_MAX		480u
+#define AR0521_FORMAT       MEDIA_BUS_FMT_RGB888_1X24
+// #define AR0521_FORMAT       MEDIA_BUS_FMT_Y8_1X8
 
 #define AR0521_WIDTH_BLANKING_MIN	572u
 #define AR0521_HEIGHT_BLANKING_MIN	38u /* must be even */
@@ -49,40 +31,6 @@
 #define AR0521_ANA_GAIN_MAX		0x3f
 #define AR0521_ANA_GAIN_STEP		0x01
 #define AR0521_ANA_GAIN_DEFAULT		0x00
-
-/* AR0521 registers */
-// #define AR0521_REG_VT_PIX_CLK_DIV		0x0300
-// #define AR0521_REG_FRAME_LENGTH_LINES		0x0340
-
-// #define AR0521_REG_CHIP_ID			0x3000
-// #define AR0521_REG_COARSE_INTEGRATION_TIME	0x3012
-// #define AR0521_REG_ROW_SPEED			0x3016
-// #define AR0521_REG_EXTRA_DELAY			0x3018
-// #define AR0521_REG_RESET			0x301A
-// #define   AR0521_REG_RESET_DEFAULTS		  0x0238
-// #define   AR0521_REG_RESET_GROUP_PARAM_HOLD	  0x8000
-// #define   AR0521_REG_RESET_STREAM		  BIT(2)
-// #define   AR0521_REG_RESET_RESTART		  BIT(1)
-// #define   AR0521_REG_RESET_INIT			  BIT(0)
-
-// #define AR0521_REG_ANA_GAIN_CODE_GLOBAL		0x3028
-
-// #define AR0521_REG_GREEN1_GAIN			0x3056
-// #define AR0521_REG_BLUE_GAIN			0x3058
-// #define AR0521_REG_RED_GAIN			0x305A
-// #define AR0521_REG_GREEN2_GAIN			0x305C
-// #define AR0521_REG_GLOBAL_GAIN			0x305E
-
-// #define AR0521_REG_HISPI_TEST_MODE		0x3066
-// #define AR0521_REG_HISPI_TEST_MODE_LP11		  0x0004
-
-// #define AR0521_REG_TEST_PATTERN_MODE		0x3070
-
-// #define AR0521_REG_SERIAL_FORMAT		0x31AE
-// #define AR0521_REG_SERIAL_FORMAT_MIPI		  0x0200
-
-// #define AR0521_REG_HISPI_CONTROL_STATUS		0x31C6
-// #define AR0521_REG_HISPI_CONTROL_STATUS_FRAMER_TEST_MODE_ENABLE 0x80
 
 #define be		cpu_to_be16
 
@@ -265,7 +213,7 @@ static void ar0521_adj_fmt(struct v4l2_mbus_framefmt *fmt)
 			   AR0521_WIDTH_MAX);
 	fmt->height = clamp(ALIGN(fmt->height, 4), AR0521_HEIGHT_MIN,
 			    AR0521_HEIGHT_MAX);
-	fmt->code = MEDIA_BUS_FMT_SGRBG8_1X8;
+	fmt->code = AR0521_FORMAT;
 	fmt->field = V4L2_FIELD_NONE;
 	fmt->colorspace = V4L2_COLORSPACE_SRGB;
 	fmt->ycbcr_enc = V4L2_YCBCR_ENC_DEFAULT;
@@ -490,10 +438,10 @@ static int ar0521_init_controls(struct ar0521_dev *sensor)
 	v4l2_ctrl_cluster(2, &ctrls->hblank);
 
 	/* Read-only */
-	ctrls->pixrate = v4l2_ctrl_new_std(hdl, ops, V4L2_CID_PIXEL_RATE,
-					   AR0521_PIXEL_CLOCK_MIN,
-					   AR0521_PIXEL_CLOCK_MAX, 1,
-					   AR0521_PIXEL_CLOCK_RATE);
+	// ctrls->pixrate = v4l2_ctrl_new_std(hdl, ops, V4L2_CID_PIXEL_RATE,
+	// 				   AR0521_PIXEL_CLOCK_MIN,
+	// 				   AR0521_PIXEL_CLOCK_MAX, 1,
+	// 				   AR0521_PIXEL_CLOCK_RATE);
 
 	/* Manual exposure time: max exposure time = visible + blank - 4 */
 	exposure_max = AR0521_HEIGHT_MAX + AR0521_HEIGHT_BLANKING_MIN - 4;
@@ -531,17 +479,17 @@ static int ar0521_power_off(struct device *dev)
 {
 	struct v4l2_subdev *sd = dev_get_drvdata(dev);
 	struct ar0521_dev *sensor = to_ar0521_dev(sd);
-	int i;
+	// int i;
 
-	clk_disable_unprepare(sensor->extclk);
+	// clk_disable_unprepare(sensor->extclk);
 
 	if (sensor->reset_gpio)
 		gpiod_set_value(sensor->reset_gpio, 1); /* assert RESET signal */
 
-	for (i = ARRAY_SIZE(ar0521_supply_names) - 1; i >= 0; i--) {
-		if (sensor->supplies[i])
-			regulator_disable(sensor->supplies[i]);
-	}
+	// for (i = ARRAY_SIZE(ar0521_supply_names) - 1; i >= 0; i--) {
+	// 	if (sensor->supplies[i])
+	// 		regulator_disable(sensor->supplies[i]);
+	// }
 	return 0;
 }
 
@@ -570,7 +518,7 @@ static int ar0521_enum_frame_size(struct v4l2_subdev *sd,
 	if (fse->index)
 		return -EINVAL;
 
-	if (fse->code != MEDIA_BUS_FMT_SGRBG8_1X8)
+	if (fse->code != AR0521_FORMAT)
 		return -EINVAL;
 
 	fse->min_width = AR0521_WIDTH_MIN;
@@ -694,9 +642,14 @@ static int ar0521_probe(struct i2c_client *client)
 	struct device *dev = &client->dev;
 	struct fwnode_handle *endpoint;
 	struct ar0521_dev *sensor;
-	unsigned int cnt;
+	// unsigned int cnt;
 	int ret;
+pr_info("----------------------- probe 1");
 
+	if (!tc358748_setup(client))
+		return false;
+
+pr_info("----------------------- probe 2");
 	sensor = devm_kzalloc(dev, sizeof(*sensor), GFP_KERNEL);
 	if (!sensor)
 		return -ENOMEM;
@@ -742,14 +695,14 @@ static int ar0521_probe(struct i2c_client *client)
 		return PTR_ERR(sensor->extclk);
 	}
 
-	sensor->extclk_freq = clk_get_rate(sensor->extclk);
+	// sensor->extclk_freq = clk_get_rate(sensor->extclk);
 
-	if (sensor->extclk_freq < AR0521_EXTCLK_MIN ||
-	    sensor->extclk_freq > AR0521_EXTCLK_MAX) {
-		dev_err(dev, "extclk frequency out of range: %u Hz\n",
-			sensor->extclk_freq);
-		return -EINVAL;
-	}
+	// if (sensor->extclk_freq < AR0521_EXTCLK_MIN ||
+	//     sensor->extclk_freq > AR0521_EXTCLK_MAX) {
+	// 	dev_err(dev, "extclk frequency out of range: %u Hz\n",
+	// 		sensor->extclk_freq);
+	// 	return -EINVAL;
+	// }
 
 	/* Request optional reset pin (usually active low) and assert it */
 	sensor->reset_gpio = devm_gpiod_get_optional(dev, "reset",
@@ -764,17 +717,17 @@ static int ar0521_probe(struct i2c_client *client)
 	if (ret)
 		return ret;
 
-	for (cnt = 0; cnt < ARRAY_SIZE(ar0521_supply_names); cnt++) {
-		struct regulator *supply = devm_regulator_get(dev,
-						ar0521_supply_names[cnt]);
+	// for (cnt = 0; cnt < ARRAY_SIZE(ar0521_supply_names); cnt++) {
+	// 	struct regulator *supply = devm_regulator_get(dev,
+	// 					ar0521_supply_names[cnt]);
 
-		if (IS_ERR(supply)) {
-			dev_info(dev, "no %s regulator found: %li\n",
-				 ar0521_supply_names[cnt], PTR_ERR(supply));
-			return PTR_ERR(supply);
-		}
-		sensor->supplies[cnt] = supply;
-	}
+	// 	if (IS_ERR(supply)) {
+	// 		dev_info(dev, "no %s regulator found: %li\n",
+	// 			 ar0521_supply_names[cnt], PTR_ERR(supply));
+	// 		return PTR_ERR(supply);
+	// 	}
+	// 	sensor->supplies[cnt] = supply;
+	// }
 
 	mutex_init(&sensor->lock);
 
@@ -795,6 +748,7 @@ static int ar0521_probe(struct i2c_client *client)
 	pm_runtime_set_active(&client->dev);
 	pm_runtime_enable(&client->dev);
 	pm_runtime_idle(&client->dev);
+pr_info("----------------------- probe end");
 	return 0;
 
 disable:
