@@ -529,9 +529,9 @@ pr_info("----------------------- set_fmt 5");
 	}
 
 	exposure_max = sensor->fmt.height + AR0521_HEIGHT_BLANKING_MIN - 4;
-pr_info("----------------------- set_fmt   exposure_max = %d, min = %d, step = %d, exposure_default = %d",
-		exposure_max, sensor->ctrls.exposure->minimum, sensor->ctrls.exposure->step,
-		sensor->ctrls.exposure->default_value);
+// pr_info("----------------------- set_fmt   exposure_max = %d, min = %d, step = %d, exposure_default = %d",
+// 		exposure_max, sensor->ctrls.exposure->minimum, sensor->ctrls.exposure->step,
+// 		sensor->ctrls.exposure->default_value);
 	ret = __v4l2_ctrl_modify_range(sensor->ctrls.exposure,
 				       sensor->ctrls.exposure->minimum,
 				       exposure_max,

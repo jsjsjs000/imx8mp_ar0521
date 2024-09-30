@@ -27,6 +27,11 @@
 #define CLKCTL          0x0020
 #define WORDCNT         0x0022
 #define PP_MISC         0x0032
+#define CLW_DPHYCONTTX  0x0100
+#define D0W_DPHYCONTTX  0x0104
+#define D1W_DPHYCONTTX  0x0108
+#define D2W_DPHYCONTTX  0x010c
+#define D3W_DPHYCONTTX  0x0110
 #define CLW_CNTRL       0x0140
 #define D0W_CNTRL       0x0144
 #define D1W_CNTRL       0x0148
@@ -385,6 +390,7 @@ bool tc358748_setup(struct i2c_client *client)
 	u32 hstxvregen;
 	u32 csi_confw;
 	u32 continuous_clock_mode;
+	u32 output_current_capacitor;
 	UNUSED u32 dbg_cnt;
 	UNUSED u32 dbg_width;
 	UNUSED u32 dbg_vblank;
@@ -703,6 +709,22 @@ bool tc358748_setup(struct i2c_client *client)
 		return false;
 	}
 	pr_info(TAG "TXOPTIONCNTRL (0x%04x) = 1", TXOPTIONCNTRL);
+
+
+	output_current_capacitor =
+			(0 << 8) |   // 0 - 0pF, 1 - 2.8pF, 2 - 3.2pF, 3.6pF
+			(15 << 4) |  // 0-15 - HS clock output delay
+			0;           // additional output current: 0 - 0%, 1 - 25%, 2 - 50%, 3 - 75%
+	if (!i2c_write_reg32(tc358748_i2c_client, CLW_DPHYCONTTX, output_current_capacitor))
+		{ pr_err(TAG "Can't write CLW_DPHYCONTTX"); return false; }
+	if (!i2c_write_reg32(tc358748_i2c_client, D0W_DPHYCONTTX, output_current_capacitor))
+		{ pr_err(TAG "Can't write D0W_DPHYCONTTX"); return false; }
+	if (!i2c_write_reg32(tc358748_i2c_client, D1W_DPHYCONTTX, output_current_capacitor))
+		{ pr_err(TAG "Can't write D1W_DPHYCONTTX"); return false; }
+	if (!i2c_write_reg32(tc358748_i2c_client, D2W_DPHYCONTTX, output_current_capacitor))
+		{ pr_err(TAG "Can't write D2W_DPHYCONTTX"); return false; }
+	if (!i2c_write_reg32(tc358748_i2c_client, D3W_DPHYCONTTX, output_current_capacitor))
+		{ pr_err(TAG "Can't write D3W_DPHYCONTTX"); return false; }
 
 
 		/* Setup the debug output */
