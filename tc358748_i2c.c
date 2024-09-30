@@ -258,6 +258,85 @@ static bool tc358748_set_pll(void)
 	return true;
 }
 
+// static void tc358746_setup(struct i2c_client *client)
+// {
+// 	struct phy_configure_opts_mipi_dphy *cfg = &tc358746->dphy_cfg;
+// 	bool non_cont_clk = !!(tc358746->csi_vep.bus.mipi_csi2.flags &
+// 			       V4L2_MBUS_CSI2_NONCONTINUOUS_CLOCK);
+// 	struct device *dev = tc358746->sd.dev;
+// 	unsigned long hs_byte_clk, hf_clk;
+// 	u32 val, val2, lptxcnt;
+// 	int err;
+
+// 	/* The hs_byte_clk is also called SYSCLK in the excel sheet */
+// 	hs_byte_clk = cfg->hs_clk_rate / 8;
+// 	hs_byte_clk /= HZ_PER_MHZ;
+// 	hf_clk = hs_byte_clk / 2;
+
+// 	val = tc358746_us_to_cnt(cfg->init, hf_clk) - 1;
+// 	dev_dbg(dev, "LINEINITCNT: %u (0x%x)\n", val, val);
+// 	err = tc358746_write(tc358746, LINEINITCNT_REG, val);
+// 	if (err)
+// 		return err;
+
+// 	val = tc358746_ps_to_cnt(cfg->lpx, hs_byte_clk) - 1;
+// 	lptxcnt = val;
+// 	dev_dbg(dev, "LPTXTIMECNT: %u (0x%x)\n", val, val);
+// 	err = tc358746_write(tc358746, LPTXTIMECNT_REG, val);
+// 	if (err)
+// 		return err;
+
+// 	val = tc358746_ps_to_cnt(cfg->clk_prepare, hs_byte_clk) - 1;
+// 	val2 = tc358746_ps_to_cnt(cfg->clk_zero, hs_byte_clk) - 1;
+// 	dev_dbg(dev, "TCLK_PREPARECNT: %u (0x%x)\n", val, val);
+// 	dev_dbg(dev, "TCLK_ZEROCNT: %u (0x%x)\n", val2, val2);
+// 	dev_dbg(dev, "TCLK_HEADERCNT: 0x%x\n",
+// 		(u32)(TCLK_PREPARECNT(val) | TCLK_ZEROCNT(val2)));
+// 	err = tc358746_write(tc358746, TCLK_HEADERCNT_REG,
+// 			     TCLK_PREPARECNT(val) | TCLK_ZEROCNT(val2));
+// 	if (err)
+// 		return err;
+
+// 	val = tc358746_ps_to_cnt(cfg->clk_trail, hs_byte_clk);
+// 	dev_dbg(dev, "TCLK_TRAILCNT: %u (0x%x)\n", val, val);
+// 	err = tc358746_write(tc358746, TCLK_TRAILCNT_REG, val);
+// 	if (err)
+// 		return err;
+
+// 	val = tc358746_ps_to_cnt(cfg->hs_prepare, hs_byte_clk) - 1;
+// 	val2 = tc358746_ps_to_cnt(cfg->hs_zero, hs_byte_clk) - 1;
+// 	dev_dbg(dev, "THS_PREPARECNT: %u (0x%x)\n", val, val);
+// 	dev_dbg(dev, "THS_ZEROCNT: %u (0x%x)\n", val2, val2);
+// 	dev_dbg(dev, "THS_HEADERCNT: 0x%x\n",
+// 		(u32)(THS_PREPARECNT(val) | THS_ZEROCNT(val2)));
+// 	err = tc358746_write(tc358746, THS_HEADERCNT_REG,
+// 			     THS_PREPARECNT(val) | THS_ZEROCNT(val2));
+// 	if (err)
+// 		return err;
+
+// 	/* TWAKEUP > 1ms in lptxcnt steps */
+// 	val = tc358746_us_to_cnt(cfg->wakeup, hs_byte_clk);
+// 	val = val / (lptxcnt + 1) - 1;
+// 	dev_dbg(dev, "TWAKEUP: %u (0x%x)\n", val, val);
+// 	err = tc358746_write(tc358746, TWAKEUP_REG, val);
+// 	if (err)
+// 		return err;
+
+// 	val = tc358746_ps_to_cnt(cfg->clk_post, hs_byte_clk);
+// 	dev_dbg(dev, "TCLK_POSTCNT: %u (0x%x)\n", val, val);
+// 	err = tc358746_write(tc358746, TCLK_POSTCNT_REG, val);
+// 	if (err)
+// 		return err;
+
+// 	val = tc358746_ps_to_cnt(cfg->hs_trail, hs_byte_clk);
+// 	dev_dbg(dev, "THS_TRAILCNT: %u (0x%x)\n", val, val);
+// 	err = tc358746_write(tc358746, THS_TRAILCNT_REG, val);
+// 	if (err)
+// 		return err;
+// }
+
+
+
 	/* setup Toshiba TC358748 by I2C */
 bool tc358748_setup(struct i2c_client *client)
 {
@@ -377,12 +456,13 @@ bool tc358748_setup(struct i2c_client *client)
 
 
 
-// // i2c_write_reg16(tc358748_i2c_client, DATAFMT, 0x60);
+// // i2c_write_reg16(tc358748_i2c_client, DATAFMT, 0x60);      // YUV...
 // i2c_write_reg16(tc358748_i2c_client, DATAFMT, 0x30);   // RGB888
 // i2c_write_reg16(tc358748_i2c_client, CONFCTL, confctl);
 // i2c_write_reg16(tc358748_i2c_client, FIFOCTL, 0x20);
 // // i2c_write_reg16(tc358748_i2c_client, WORDCNT, 0xf00);
-// i2c_write_reg16(tc358748_i2c_client, WORDCNT, 640 * 3); // 640
+// // i2c_write_reg16(tc358748_i2c_client, WORDCNT, 640 * 2); // 640 dla YUV...
+// i2c_write_reg16(tc358748_i2c_client, WORDCNT, 640 * 3); // 640 dla RGB
 // i2c_write_reg32(tc358748_i2c_client, CSI_RESET, 0);
 
 // confctl |= (1 << 6);                                   /* Parallel port enable */
@@ -396,22 +476,38 @@ bool tc358748_setup(struct i2c_client *client)
 // i2c_write_reg32(tc358748_i2c_client, D1W_CNTRL, 0x148);
 // i2c_write_reg32(tc358748_i2c_client, D2W_CNTRL, 0x14c);
 // i2c_write_reg32(tc358748_i2c_client, D3W_CNTRL, 0x150);
-// i2c_write_reg32(tc358748_i2c_client, LINEINITCNT, 0x15ba);
+// // i2c_write_reg32(tc358748_i2c_client, LINEINITCNT, 0x15ba);
+// // i2c_write_reg32(tc358748_i2c_client, LPTXTIMECNT, 0x2);
+// // i2c_write_reg32(tc358748_i2c_client, TCLK_HEADERCNT, 0xa03);
+
+// i2c_write_reg32(tc358748_i2c_client, LINEINITCNT, 0x012a);
 // i2c_write_reg32(tc358748_i2c_client, LPTXTIMECNT, 0x2);
-// i2c_write_reg32(tc358748_i2c_client, TCLK_HEADERCNT, 0xa03);
+// i2c_write_reg32(tc358748_i2c_client, TCLK_HEADERCNT, 0x23);
 
 // // i2c_write_reg32(tc358748_i2c_client, TCLK_TRAILCNT, 0xffffffff);
-// i2c_write_reg32(tc358748_i2c_client, TCLK_TRAILCNT, 1);
+// // i2c_write_reg32(tc358748_i2c_client, TCLK_TRAILCNT, 1);
+// i2c_write_reg32(tc358748_i2c_client, TCLK_TRAILCNT, 2);
 // // i2c_write_reg32(tc358748_i2c_client, THS_HEADERCNT, 0xffffee03);
+// // i2c_write_reg32(tc358748_i2c_client, THS_HEADERCNT, 0x0101);
 // i2c_write_reg32(tc358748_i2c_client, THS_HEADERCNT, 0x0101);
 
-// i2c_write_reg32(tc358748_i2c_client, TWAKEUP, 0x49e0);
-// i2c_write_reg32(tc358748_i2c_client, TCLK_POSTCNT, 0x7);
-// i2c_write_reg32(tc358748_i2c_client, THS_TRAILCNT, 0x1);
+// // i2c_write_reg32(tc358748_i2c_client, TWAKEUP, 0x49e0);
+// // i2c_write_reg32(tc358748_i2c_client, TCLK_POSTCNT, 0x7);
+// // i2c_write_reg32(tc358748_i2c_client, THS_TRAILCNT, 0x1);
+
+// i2c_write_reg32(tc358748_i2c_client, TWAKEUP, 0x02);
+// i2c_write_reg32(tc358748_i2c_client, TCLK_POSTCNT, 0x01);
+// i2c_write_reg32(tc358748_i2c_client, THS_TRAILCNT, 0x01);
+
 // i2c_write_reg32(tc358748_i2c_client, HSTXVREGEN, 0x1f);
 // i2c_write_reg32(tc358748_i2c_client, STARTCNTRL, 0x1);
 // i2c_write_reg32(tc358748_i2c_client, CSI_CONFW, 2734719110);
 // return true;
+
+
+// tc358746_setup();
+// return true;
+
 
 		/* FIFOCTL - FiFo level */
 	fifoctl = 16; // 12 RGB888 ;//16;  // $$
