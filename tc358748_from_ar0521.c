@@ -101,14 +101,22 @@ static int ar0521_set_stream(struct ar0521_dev *sensor, bool on)
 		if (ret < 0)
 			return ret;
 
+// $$
+// https://github.com/avionic-design/linux-l4t/blob/meerkat/l4t-r21-5/drivers/media/i2c/tc358748.c#L756
+// ret = v4l2_subdev_call(&sensor->sd, video, s_stream, 1);
+// if (ret && ret != -ENOIOCTLCMD)
+// 	return ret;
+
 		// ret =  __v4l2_ctrl_handler_setup(&sensor->ctrls.handler);
 		// if (ret)
 		// 	goto err;
 
+pr_info("----------------------- set_stream on");
 		return 0;
 
 // err:
 // 		pm_runtime_put(&sensor->i2c_client->dev);
+// pr_info("----------------------- set_stream err");
 // 		return ret;
 
 	} else {
@@ -117,6 +125,7 @@ static int ar0521_set_stream(struct ar0521_dev *sensor, bool on)
 		 * this
 		 */
 
+pr_info("----------------------- set_stream off");
 		pm_runtime_put(&sensor->i2c_client->dev);
 		return 0;
 	}

@@ -564,6 +564,7 @@ bool tc358748_setup(struct i2c_client *client)
 	msleep(10);
 
 
+		/* from driver: https://github.com/avionic-design/linux-l4t/blob/meerkat/l4t-r21-5/drivers/media/i2c/tc358748.c#L574 */
 		/* Compute the D-PHY settings */
 	hsbyte_clk = csi_lane_rate / 8;
 

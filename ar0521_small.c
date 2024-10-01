@@ -363,6 +363,7 @@ static int ar0521_set_stream(struct ar0521_dev *sensor, bool on)
 	int ret;
 
 	if (on) {
+pr_info("----------------------- set_stream on");
 		ret = pm_runtime_resume_and_get(&sensor->i2c_client->dev);
 		if (ret < 0)
 			return ret;
@@ -402,6 +403,7 @@ static int ar0521_set_stream(struct ar0521_dev *sensor, bool on)
 
 err:
 		pm_runtime_put(&sensor->i2c_client->dev);
+pr_info("----------------------- set_stream err");
 		return ret;
 
 	} else {
@@ -409,6 +411,7 @@ err:
 		 * Reset gain, the sensor may produce all white pixels without
 		 * this
 		 */
+pr_info("----------------------- set_stream off");
 		ret = ar0521_write_reg(sensor, AR0521_REG_GLOBAL_GAIN, 0x2000);
 		if (ret)
 			return ret;
