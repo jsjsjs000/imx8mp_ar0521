@@ -4,6 +4,8 @@
 
 ar5-objs := tc358748_from_ar0521.o tc358748_i2c.o
 
+# ar5-objs := tc358748_from_ar0521.o
+
 obj-m += ar5.o
 
 KDIR = ~/linux-imx-v5.15.71_2.2.2-phy/

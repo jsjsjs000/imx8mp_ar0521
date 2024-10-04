@@ -20,8 +20,9 @@
 #define AR0521_HEIGHT_MIN		64u
 #define AR0521_HEIGHT_MAX		480u
 
-// #define AR0521_FORMAT       MEDIA_BUS_FMT_RGB888_1X24
-#define AR0521_FORMAT       MEDIA_BUS_FMT_Y8_1X8
+#define AR0521_FORMAT       MEDIA_BUS_FMT_RGB888_1X24
+// #define AR0521_FORMAT       MEDIA_BUS_FMT_Y8_1X8
+// #define AR0521_FORMAT       MEDIA_BUS_FMT_UYVY8_1X16  // YCbCr 422 16-bit
 
 #define AR0521_WIDTH_BLANKING_MIN	572u
 #define AR0521_HEIGHT_BLANKING_MIN	38u /* must be even */
@@ -134,10 +135,8 @@ pr_info("----------------------- set_stream off");
 static void ar0521_adj_fmt(struct v4l2_mbus_framefmt *fmt)
 {
 pr_info("----------------------- adj_fmt 1");
-	fmt->width = clamp(ALIGN(fmt->width, 4), AR0521_WIDTH_MIN,
-			   AR0521_WIDTH_MAX);
-	fmt->height = clamp(ALIGN(fmt->height, 4), AR0521_HEIGHT_MIN,
-			    AR0521_HEIGHT_MAX);
+	fmt->width = clamp(ALIGN(fmt->width, 4), AR0521_WIDTH_MIN, AR0521_WIDTH_MAX);
+	fmt->height = clamp(ALIGN(fmt->height, 4), AR0521_HEIGHT_MIN, AR0521_HEIGHT_MAX);
 	fmt->code = AR0521_FORMAT;
 	fmt->field = V4L2_FIELD_NONE;
 	fmt->colorspace = V4L2_COLORSPACE_SRGB;
@@ -155,6 +154,8 @@ static int ar0521_get_fmt(struct v4l2_subdev *sd,
 	struct v4l2_mbus_framefmt *fmt;
 
 	mutex_lock(&sensor->lock);
+
+pr_info("----------------------- get_fmt 1");
 
 	if (format->which == V4L2_SUBDEV_FORMAT_TRY)
 		fmt = v4l2_subdev_get_try_format(&sensor->sd, sd_state, 0
@@ -396,7 +397,15 @@ static int ar0521_power_off(struct device *dev)
 
 static int ar0521_power_on(struct device *dev)
 {
-  return 0;
+	// struct v4l2_subdev *sd = dev_get_drvdata(dev);
+	// struct ar0521_dev *sensor = to_ar0521_dev(sd);
+
+	// if (!tc358748_setup(sensor->i2c_client))
+	// 	return false;
+
+pr_info("----------------------- power_on");
+
+ return 0;
 }
 
 static int ar0521_enum_mbus_code(struct v4l2_subdev *sd,
@@ -588,6 +597,14 @@ pr_info("----------------------- probe 2");
 		dev_err(dev, "invalid number of MIPI data lanes\n");
 		return -EINVAL;
 	}
+
+pr_info("----------------------- probe data lanes %d", sensor->lane_count);
+if (ep.bus.mipi_csi2.flags & V4L2_MBUS_CSI2_NONCONTINUOUS_CLOCK) {
+	pr_info("----------------------- probe clock noncontinuous");
+}
+if (ep.bus.mipi_csi2.flags & V4L2_MBUS_CSI2_CONTINUOUS_CLOCK) {
+	pr_info("----------------------- probe clock continuous");
+}
 
 	/* Get master clock (extclk) */
 	sensor->extclk = devm_clk_get(dev, "ext");

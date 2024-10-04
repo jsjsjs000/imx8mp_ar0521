@@ -390,7 +390,7 @@ bool tc358748_setup(struct i2c_client *client)
 	u32 hstxvregen;
 	u32 csi_confw;
 	u32 continuous_clock_mode;
-	u32 output_current_capacitor;
+	// u32 output_current_capacitor;
 	UNUSED u32 dbg_cnt;
 	UNUSED u32 dbg_width;
 	UNUSED u32 dbg_vblank;
@@ -482,28 +482,28 @@ bool tc358748_setup(struct i2c_client *client)
 // i2c_write_reg32(tc358748_i2c_client, D1W_CNTRL, 0x148);
 // i2c_write_reg32(tc358748_i2c_client, D2W_CNTRL, 0x14c);
 // i2c_write_reg32(tc358748_i2c_client, D3W_CNTRL, 0x150);
-// // i2c_write_reg32(tc358748_i2c_client, LINEINITCNT, 0x15ba);
-// // i2c_write_reg32(tc358748_i2c_client, LPTXTIMECNT, 0x2);
-// // i2c_write_reg32(tc358748_i2c_client, TCLK_HEADERCNT, 0xa03);
-
-// i2c_write_reg32(tc358748_i2c_client, LINEINITCNT, 0x012a);
+// i2c_write_reg32(tc358748_i2c_client, LINEINITCNT, 0x15ba);
 // i2c_write_reg32(tc358748_i2c_client, LPTXTIMECNT, 0x2);
-// i2c_write_reg32(tc358748_i2c_client, TCLK_HEADERCNT, 0x23);
+// i2c_write_reg32(tc358748_i2c_client, TCLK_HEADERCNT, 0xa03);
+
+// // i2c_write_reg32(tc358748_i2c_client, LINEINITCNT, 0x012a);
+// // i2c_write_reg32(tc358748_i2c_client, LPTXTIMECNT, 0x2);
+// // i2c_write_reg32(tc358748_i2c_client, TCLK_HEADERCNT, 0x23);
 
 // // i2c_write_reg32(tc358748_i2c_client, TCLK_TRAILCNT, 0xffffffff);
-// // i2c_write_reg32(tc358748_i2c_client, TCLK_TRAILCNT, 1);
-// i2c_write_reg32(tc358748_i2c_client, TCLK_TRAILCNT, 2);
+// i2c_write_reg32(tc358748_i2c_client, TCLK_TRAILCNT, 1);
+// // i2c_write_reg32(tc358748_i2c_client, TCLK_TRAILCNT, 2);
 // // i2c_write_reg32(tc358748_i2c_client, THS_HEADERCNT, 0xffffee03);
-// // i2c_write_reg32(tc358748_i2c_client, THS_HEADERCNT, 0x0101);
 // i2c_write_reg32(tc358748_i2c_client, THS_HEADERCNT, 0x0101);
+// // i2c_write_reg32(tc358748_i2c_client, THS_HEADERCNT, 0x0101);
 
-// // i2c_write_reg32(tc358748_i2c_client, TWAKEUP, 0x49e0);
-// // i2c_write_reg32(tc358748_i2c_client, TCLK_POSTCNT, 0x7);
-// // i2c_write_reg32(tc358748_i2c_client, THS_TRAILCNT, 0x1);
+// i2c_write_reg32(tc358748_i2c_client, TWAKEUP, 0x49e0);
+// i2c_write_reg32(tc358748_i2c_client, TCLK_POSTCNT, 0x7);
+// i2c_write_reg32(tc358748_i2c_client, THS_TRAILCNT, 0x1);
 
-// i2c_write_reg32(tc358748_i2c_client, TWAKEUP, 0x02);
-// i2c_write_reg32(tc358748_i2c_client, TCLK_POSTCNT, 0x01);
-// i2c_write_reg32(tc358748_i2c_client, THS_TRAILCNT, 0x01);
+// // i2c_write_reg32(tc358748_i2c_client, TWAKEUP, 0x02);
+// // i2c_write_reg32(tc358748_i2c_client, TCLK_POSTCNT, 0x01);
+// // i2c_write_reg32(tc358748_i2c_client, THS_TRAILCNT, 0x01);
 
 // i2c_write_reg32(tc358748_i2c_client, HSTXVREGEN, 0x1f);
 // i2c_write_reg32(tc358748_i2c_client, STARTCNTRL, 0x1);
@@ -516,8 +516,8 @@ bool tc358748_setup(struct i2c_client *client)
 
 
 		/* FIFOCTL - FiFo level */
-	fifoctl = 16; // 12 RGB888 ;//16;  // $$
-	// fifoctl = 16; // 12 RGB888 ;//16;  // $$
+	fifoctl = 0;
+// fifoctl = 16; // 12 RGB888 ;//16;  // $$
 // fifoctl = 0x20; // for YUV422 $$
 	if (!i2c_write_reg16(tc358748_i2c_client, FIFOCTL, fifoctl))
 	{
@@ -712,20 +712,20 @@ bool tc358748_setup(struct i2c_client *client)
 	pr_info(TAG "TXOPTIONCNTRL (0x%04x) = 1", TXOPTIONCNTRL);
 
 
-	output_current_capacitor =
-			(0 << 8) |   // 0 - 0pF, 1 - 2.8pF, 2 - 3.2pF, 3.6pF
-			(15 << 4) |  // 0-15 - HS clock output delay
-			0;           // additional output current: 0 - 0%, 1 - 25%, 2 - 50%, 3 - 75%
-	if (!i2c_write_reg32(tc358748_i2c_client, CLW_DPHYCONTTX, output_current_capacitor))
-		{ pr_err(TAG "Can't write CLW_DPHYCONTTX"); return false; }
-	if (!i2c_write_reg32(tc358748_i2c_client, D0W_DPHYCONTTX, output_current_capacitor))
-		{ pr_err(TAG "Can't write D0W_DPHYCONTTX"); return false; }
-	if (!i2c_write_reg32(tc358748_i2c_client, D1W_DPHYCONTTX, output_current_capacitor))
-		{ pr_err(TAG "Can't write D1W_DPHYCONTTX"); return false; }
-	if (!i2c_write_reg32(tc358748_i2c_client, D2W_DPHYCONTTX, output_current_capacitor))
-		{ pr_err(TAG "Can't write D2W_DPHYCONTTX"); return false; }
-	if (!i2c_write_reg32(tc358748_i2c_client, D3W_DPHYCONTTX, output_current_capacitor))
-		{ pr_err(TAG "Can't write D3W_DPHYCONTTX"); return false; }
+	// output_current_capacitor =
+	// 		(0 << 8) |   // 0 - 0pF, 1 - 2.8pF, 2 - 3.2pF, 3.6pF
+	// 		(15 << 4) |  // 0-15 - HS clock output delay
+	// 		0;           // additional output current: 0 - 0%, 1 - 25%, 2 - 50%, 3 - 75%
+	// if (!i2c_write_reg32(tc358748_i2c_client, CLW_DPHYCONTTX, output_current_capacitor))
+	// 	{ pr_err(TAG "Can't write CLW_DPHYCONTTX"); return false; }
+	// if (!i2c_write_reg32(tc358748_i2c_client, D0W_DPHYCONTTX, output_current_capacitor))
+	// 	{ pr_err(TAG "Can't write D0W_DPHYCONTTX"); return false; }
+	// if (!i2c_write_reg32(tc358748_i2c_client, D1W_DPHYCONTTX, output_current_capacitor))
+	// 	{ pr_err(TAG "Can't write D1W_DPHYCONTTX"); return false; }
+	// if (!i2c_write_reg32(tc358748_i2c_client, D2W_DPHYCONTTX, output_current_capacitor))
+	// 	{ pr_err(TAG "Can't write D2W_DPHYCONTTX"); return false; }
+	// if (!i2c_write_reg32(tc358748_i2c_client, D3W_DPHYCONTTX, output_current_capacitor))
+	// 	{ pr_err(TAG "Can't write D3W_DPHYCONTTX"); return false; }
 
 
 		/* Setup the debug output */
