@@ -140,6 +140,7 @@ pr_info("----------------------- adj_fmt 1");
 	fmt->code = AR0521_FORMAT;
 	fmt->field = V4L2_FIELD_NONE;
 	fmt->colorspace = V4L2_COLORSPACE_SRGB;
+	// fmt->colorspace = V4L2_COLORSPACE_RAW;
 	fmt->ycbcr_enc = V4L2_YCBCR_ENC_DEFAULT;
 	fmt->quantization = V4L2_QUANTIZATION_FULL_RANGE;
 	fmt->xfer_func = V4L2_XFER_FUNC_DEFAULT;
@@ -155,12 +156,19 @@ static int ar0521_get_fmt(struct v4l2_subdev *sd,
 
 	mutex_lock(&sensor->lock);
 
-pr_info("----------------------- get_fmt 1");
+pr_info("----------------------- get_fmt");
+// pr_info("----------------------- get_fmt 0x%04x", format->format.code);
 
-	if (format->which == V4L2_SUBDEV_FORMAT_TRY)
-		fmt = v4l2_subdev_get_try_format(&sensor->sd, sd_state, 0
-						 /* pad */);
-	else
+
+// if (format->which == V4L2_SUBDEV_FORMAT_TRY)
+// {
+// mutex_unlock(&sensor->lock);
+// return 0;
+// }
+
+	// if (format->which == V4L2_SUBDEV_FORMAT_TRY)
+	// 	fmt = v4l2_subdev_get_try_format(&sensor->sd, sd_state, 0 /* pad */);
+	// else
 		fmt = &sensor->fmt;
 
 	format->format = *fmt;
@@ -180,6 +188,12 @@ static int ar0521_set_fmt(struct v4l2_subdev *sd,
 	ar0521_adj_fmt(&format->format);
 
 	mutex_lock(&sensor->lock);
+
+if (format->format.code != AR0521_FORMAT)
+{
+	mutex_unlock(&sensor->lock);
+	return -EINVAL;
+}
 
 	if (format->which == V4L2_SUBDEV_FORMAT_TRY) {
 		struct v4l2_mbus_framefmt *fmt;
