@@ -356,9 +356,9 @@ bool tc358748_setup(struct i2c_client *client)
 	UNUSED const u16 v_sync = 2;
 	UNUSED const u16 v_back_porch = 33;
 
-	const u8 bpp = 24;
-	// const u8 bpp = 16;
-	// const u8 bpp = 8;
+	const u8 bpp = 24;  // RGB
+	// const u8 bpp = 16;  // YUVx 16
+	// const u8 bpp = 8;  // RAW8
 	const u8 num_data_lanes = 4;  // $$
 	// const u8 num_data_lanes = 1;
 	const u32 pixelclock = 12676060;                      // 800 * 525 * 30,181095238 = 12'676'060
@@ -518,8 +518,14 @@ bool tc358748_setup(struct i2c_client *client)
 
 
 		/* FIFOCTL - FiFo level */
-	fifoctl = 1;
-// fifoctl = 16; // 12 RGB888 ;//16;  // $$
+	fifoctl = 0x20;
+// fifoctl = 12 * 3; // 48 $$
+// fifoctl = 24; // $$ ok
+// fifoctl = 32; // $$ ok
+// fifoctl = 34; // $$ ok
+// fifoctl = 35; // $$ nie ok
+// fifoctl = 36; // $$ nie ok
+// fifoctl = 40; // $$ nie ok
 // fifoctl = 0x20; // for YUV422 $$
 	if (!i2c_write_reg16(tc358748_i2c_client, FIFOCTL, fifoctl))
 	{
@@ -585,6 +591,71 @@ bool tc358748_setup(struct i2c_client *client)
 	if (tclk_prepare > clk_count(hsbyte_clk, 95))
 		pr_warn(TAG "TCLK_PREPARE is too long (%u ns)\n", clk_ns(hsbyte_clk, tclk_prepare));
 	// TODO: Check that TCLK_PREPARE <= 95ns
+
+/*
+CLKCTL (0x0020) = 0x002a - Setup PLL divider
+PLLCTL1 (0x0018) = 0x0e13 - Turn on clocks
+CONFCTL (0x0004) = 0x0007
+FIFOCTL (0x0006) = 1 - FiFo Level
+DATAFMT (0x0008) = 0x0030 - Data Format
+WORDCNT (0x0022) = 1920 - Word count
+CONFCTL (0x0004) = 0x0047
+CSI_START (0x0518) = 1
+  hsbyte_clk = 9507045
+  linecnt = 476
+  lptxtime = 1
+  t_wakeup = 9508
+  tclk_prepare = 1
+  tclk_zero = 2
+  tclk_trail = 1
+  tclk_post = 8
+  ths_prepare = 1
+  ths_zero = 2
+  ths_trail = 2
+LINEINITCNT (0x0210) = 476
+LPTXTIMECNT (0x0214) = 1
+TCLK_HEADERCNT (0x0218) = 0x00000201
+TCLK_TRAILCNT (0x021c) = 1
+THS_HEADERCNT (0x0220) = 0x00000201
+TWAKEUP (0x0224) = 9508
+TCLK_POSTCNT (0x0228) = 8
+THS_TRAILCNT (0x022c) = 2
+HSTXVREGCNT (0x0230) = 5
+HSTXVREGEN (0x0234) = 0x0000001f
+TXOPTIONCNTRL (0x0238) = 1
+STARTCNTRL (0x0204) = 1
+CSI_CONFW (0x0500) = 0xa3008086
+*/
+
+// linecnt = 476
+// lptxtime = 1
+// t_wakeup = 9508
+// tclk_post = 8    // 12 bad px
+
+// linecnt = 1000;
+// lptxtime = 0;
+// t_wakeup = 1000;
+// tclk_post = 16;  // 17 bad px 
+
+// linecnt = 700;
+// lptxtime = 2;
+// t_wakeup = 10000;
+// tclk_post = 2;   // 17
+
+// linecnt = 300;
+// lptxtime = 0;
+// t_wakeup = 20000;
+// tclk_post = 0;  // 16 bad px 
+
+// linecnt = 1000;
+// lptxtime = 2;
+// t_wakeup = 20000;
+// tclk_post = 8;  // popsuty obraz
+
+// linecnt = 476;
+// lptxtime = 1;
+// t_wakeup = 20000;
+// tclk_post = 8;  // 12 bad px
 
 		/* TCLK_ZERO + TCLK_PREPARE >= 300ns */
 	tclk_zero = clk_count(hsbyte_clk, 300) - tclk_prepare;
