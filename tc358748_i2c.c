@@ -357,6 +357,8 @@ bool tc358748_setup(struct i2c_client *client)
 	UNUSED const u16 v_back_porch = 33;
 
 	const u8 bpp = 24;
+	// const u8 bpp = 16;
+	// const u8 bpp = 8;
 	const u8 num_data_lanes = 4;  // $$
 	// const u8 num_data_lanes = 1;
 	const u32 pixelclock = 12676060;                      // 800 * 525 * 30,181095238 = 12'676'060
@@ -452,7 +454,7 @@ bool tc358748_setup(struct i2c_client *client)
 			// (1 << 3) |  /* Parallel clock polarity inverted */
 			// (1 << 4) |  /* H Sync active low */
 			// (1 << 5) |  /* V Sync active low */
-			(3 << 8);   /* Parallel data format - reserved */
+			(0 << 8);   /* Parallel data format - Mode 0 */
 	if (!i2c_write_reg16(tc358748_i2c_client, CONFCTL, confctl))
 	{
 		pr_err(TAG "Can't write CONFCTL");
@@ -529,6 +531,7 @@ bool tc358748_setup(struct i2c_client *client)
 		/* DATAFMT - Data Format */
 	datafmt = (3 << 4);  /* 3 - RGB888 */
 // datafmt = (6 << 4);  /* 6 - YUV422 8-bit $$ */
+	// datafmt = (0 << 4);  /* 0 - RAW8 */
 	if (!i2c_write_reg16(tc358748_i2c_client, DATAFMT, datafmt))
 	{
 		pr_err(TAG "Can't write DATAFMT");

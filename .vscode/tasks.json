@@ -12,10 +12,11 @@
 		"echo": false,
 		"reveal": "always",
 		"focus": true,
-		"panel": "dedicated",
+		"panel": "dedicated",  /* "shared" */
 		"showReuseMessage": true,
+		"clear": true,
 	},
-	"tasks": [
+"tasks": [
 			/* Configure launch.json (debug) preLaunchTask Task */
 		{
 			"label": "var-deploy-gdb",
