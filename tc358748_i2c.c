@@ -206,8 +206,8 @@ static bool tc358748_set_pll(void)
 	const u16 fbd = 383;
 	const u8 prd = 1;
 
-	const u8 frs = 3;      // Pll_clk =  76'056'360    with DDR 4 lanes
-	// const u8 frs = 2;      // Pll_clk = 152'112'720 without DDR 4 lanes  $$
+	// const u8 frs = 3;      // Pll_clk =  76'056'360    with DDR 4 lanes
+	const u8 frs = 2;      // Pll_clk = 152'112'720 without DDR 4 lanes  $$
 	// const u8 frs = 1;         // Pll_clk = 304'225'440    with DDR 1 lane   $$
 	                          // CSI TX Clk = Pll_clk / 2
 	const u8 sclk_div = frs > 2 ? 2 : frs;
@@ -359,11 +359,12 @@ bool tc358748_setup(struct i2c_client *client)
 	const u8 bpp = 24;  // RGB
 	// const u8 bpp = 16;  // YUVx 16
 	// const u8 bpp = 8;  // RAW8
-	const u8 num_data_lanes = 4;  // $$
+	// const u8 num_data_lanes = 4;  // $$
+	const u8 num_data_lanes = 2;  // $$
 	// const u8 num_data_lanes = 1;
 	const u32 pixelclock = 12676060;                      // 800 * 525 * 30,181095238 = 12'676'060
-	const u32 csi_bus = 38028180;                      // 38'028'180 with DDR 4 lanes
-	// const u32 csi_bus = 76056360;                      // 76'056'360 without DDR 4 lanes  $$
+	// const u32 csi_bus = 38028180;                      // 38'028'180 with DDR 4 lanes
+	const u32 csi_bus = 76056360;                      // 76'056'360 without DDR 4 lanes  $$
 	// const u32 csi_bus = 152112720;                        // 152'112'720 with DDR 1 lane  $$
 	const u32 csi_rate = bpp * pixelclock;                // 304'225'440 bps
 	const u32 csi_lane_rate = csi_rate / num_data_lanes;  // 76'056'360 (min 62'500'000, max 1G)
@@ -518,7 +519,7 @@ bool tc358748_setup(struct i2c_client *client)
 
 
 		/* FIFOCTL - FiFo level */
-	fifoctl = 0x20;
+	fifoctl = 16;
 // fifoctl = 12 * 3; // 48 $$
 // fifoctl = 24; // $$ ok
 // fifoctl = 32; // $$ ok
