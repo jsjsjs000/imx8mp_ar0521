@@ -346,15 +346,15 @@ static bool tc358748_set_pll(void)
 bool tc358748_setup(struct i2c_client *client)
 {
 	UNUSED const u16 width = 640;
-	UNUSED const u16 height = 480;
-	UNUSED const u16 total_width = 800;
-	UNUSED const u16 total_height = 525;
-	UNUSED const u16 h_front_porch = 16;
-	UNUSED const u16 h_sync = 96;
-	UNUSED const u16 h_back_porch = 48;
-	UNUSED const u16 v_front_porch = 10;
-	UNUSED const u16 v_sync = 2;
-	UNUSED const u16 v_back_porch = 33;
+	// UNUSED const u16 height = 480;
+	// UNUSED const u16 total_width = 800;
+	// UNUSED const u16 total_height = 525;
+	// UNUSED const u16 h_front_porch = 16;
+	// UNUSED const u16 h_sync = 96;
+	// UNUSED const u16 h_back_porch = 48;
+	// UNUSED const u16 v_front_porch = 10;
+	// UNUSED const u16 v_sync = 2;
+	// UNUSED const u16 v_back_porch = 33;
 
 	const u8 bpp = 24;  // RGB
 	// const u8 bpp = 16;  // YUVx 16
@@ -364,7 +364,7 @@ bool tc358748_setup(struct i2c_client *client)
 	// const u8 num_data_lanes = 1;
 	const u32 pixelclock = 12676060;                      // 800 * 525 * 30,181095238 = 12'676'060
 	// const u32 csi_bus = 38028180;                      // 38'028'180 with DDR 4 lanes
-	const u32 csi_bus = 76056360;                      // 76'056'360 without DDR 4 lanes  $$
+	// const u32 csi_bus = 76056360;                      // 76'056'360 without DDR 4 lanes  $$
 	// const u32 csi_bus = 152112720;                        // 152'112'720 with DDR 1 lane  $$
 	const u32 csi_rate = bpp * pixelclock;                // 304'225'440 bps
 	const u32 csi_lane_rate = csi_rate / num_data_lanes;  // 76'056'360 (min 62'500'000, max 1G)
@@ -403,7 +403,7 @@ bool tc358748_setup(struct i2c_client *client)
 	pr_info(TAG "  bpp = %d", bpp);
 	pr_info(TAG "  num_data_lanes = %d", num_data_lanes);
 	pr_info(TAG "  pixelclock = %u", pixelclock);
-	pr_info(TAG "  csi_bus = %u", csi_bus);
+	// pr_info(TAG "  csi_bus = %u", csi_bus);
 	pr_info(TAG "  csi_rate = %u", csi_rate);
 	pr_info(TAG "  csi_lane_rate = %u", csi_lane_rate);
 
@@ -519,7 +519,8 @@ bool tc358748_setup(struct i2c_client *client)
 
 
 		/* FIFOCTL - FiFo level */
-	fifoctl = 16;
+	fifoctl = 1;
+	// fifoctl = 44;
 // fifoctl = 12 * 3; // 48 $$
 // fifoctl = 24; // $$ ok
 // fifoctl = 32; // $$ ok
@@ -653,8 +654,8 @@ CSI_CONFW (0x0500) = 0xa3008086
 // t_wakeup = 20000;
 // tclk_post = 8;  // popsuty obraz
 
-// linecnt = 476;
-// lptxtime = 1;
+// linecnt = 2000;
+// lptxtime = 3;
 // t_wakeup = 20000;
 // tclk_post = 8;  // 12 bad px
 
@@ -679,6 +680,34 @@ CSI_CONFW (0x0500) = 0xa3008086
 		/* 105ns + 12*UI > THS_TRAIL >= max(8*UI, 60ns + 4*UI) */
 	ths_trail = clk_count(hsbyte_clk,
 			max(clk_ns(csi_lane_rate, 8), 60 + clk_ns(csi_lane_rate, 4)));
+
+// tclk_post = 4;
+// ths_prepare = 4;
+// ths_zero = 4;
+// ths_trail = 4;
+
+// 	1 line
+// linecnt = 1902;
+// lptxtime = 2;
+// t_wakeup = 19015;
+// tclk_prepare = 2;
+// tclk_zero = 10;
+// tclk_trail = 3;
+// tclk_post = 9;
+// ths_prepare = 3;
+// ths_zero = 4;
+// ths_trail = 3;
+
+// linecnt = 402;
+// lptxtime = 1;
+// t_wakeup = 49015;
+// tclk_prepare = 4;
+// tclk_zero = 2;
+// tclk_trail = 2;
+// tclk_post = 2;
+// ths_prepare = 2;
+// ths_zero = 2;
+// ths_trail = 40;
 
 	pr_info(TAG "  hsbyte_clk = %u", hsbyte_clk);
 	pr_info(TAG "  linecnt = %u", linecnt);
