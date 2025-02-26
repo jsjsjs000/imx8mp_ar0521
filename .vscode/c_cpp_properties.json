@@ -4,16 +4,41 @@
 			"name": "Linux",
 			"includePath": [
 				"${workspaceFolder}/**",
-				"/opt/ampliphy-vendor-xwayland/BSP-Yocto-NXP-i.MX8MP-PD23.1.0/sysroots/cortexa53-crypto-phytec-linux/usr/include/**",
-				"/opt/ampliphy-vendor-xwayland/BSP-Yocto-NXP-i.MX8MP-PD23.1.0/sysroots/cortexa53-crypto-phytec-linux/lib/modules/5.15.71-bsp-yocto-nxp-i.mx8mp-pd23.1.0/build/include/**"
+				"/opt/ampliphy-vendor-xwayland/BSP-Yocto-NXP-i.MX8MP-PD23.1.0/sysroots/cortexa53-crypto-phytec-linux/lib/modules/5.15.71-bsp-yocto-nxp-i.mx8mp-pd23.1.0/build/include/**",
+				"~/linux-imx-v5.15.71_2.2.2-phy/include/**",
+				"~/linux-imx-v5.15.71_2.2.2-phy/arch/arm64/include/**"
+
+				// "/opt/ampliphy-vendor-xwayland/BSP-Yocto-NXP-i.MX8MP-PD23.1.0/sysroots/cortexa53-crypto-phytec-linux/lib/modules/5.15.71-bsp-yocto-nxp-i.mx8mp-pd23.1.0/build/include/**"
+				// "~/linux-imx-v5.15.71_2.2.2-phy/arch/sh/include/uapi/**",
+				// "~/linux-imx-v5.15.71_2.2.2-phy/include/linux/**",
+				// "~/linux-imx-v5.15.71_2.2.2-phy/include/generated/**",
+				// "~/linux-imx-v5.15.71_2.2.2-phy/include/asm-generic/**",
+				// "~/linux-imx-v5.15.71_2.2.2-phy/arch/arm64/include/**",
+				// "~/linux-imx-v5.15.71_2.2.2-phy/arch/arm64/include/generated/**",
+				// "~/linux-imx-v5.15.71_2.2.2-phy/tools/include/**",
+				// "~/linux-imx-v5.15.71_2.2.2-phy/tools/lib/**"
 			],
-			// "defines": [],
-			// "compilerPath": "/usr/bin/gcc",
+			"defines": [
+				"__GNUC__",
+				"__KERNEL__",
+				"MODULE",
+				"KBUILD_MODNAME='${config:PROGRAM_NAME}'"
+			],
+			"configurationProvider": "includePath",
 			// "cStandard": "c17",
 			// "cppStandard": "gnu++14",
 			// "intelliSenseMode": "clang-arm64",
 			// "intelliSenseMode": "linux-gcc-x64",
-			"configurationProvider": "includePath"
+			"intelliSenseMode": "linux-gcc-arm64",
+			// "compilerPath": "/usr/bin/gcc",
+			"compilerPath": "/opt/ampliphy-vendor-xwayland/BSP-Yocto-NXP-i.MX8MP-PD23.1.0/sysroots/x86_64-phytecsdk-linux/usr/bin/aarch64-phytec-linux/aarch64-phytec-linux-gcc",
+			"compilerArgs": [
+				"ARCH=arm64",
+				"CROSS_COMPILE=/opt/ampliphy-vendor-xwayland/BSP-Yocto-NXP-i.MX8MP-PD23.1.0/sysroots/cortexa53-crypto-phytec-linux/usr/bin/aarch64-phytec-linux-"
+			],
+			"forcedInclude": [
+				"~/linux-imx-v5.15.71_2.2.2-phy/include/generated/autoconf.h"
+			]
 		}
 	],
 	"version": 4

@@ -45,18 +45,19 @@
 		{
 			"label": "build",
 			"type": "shell",
-			"command": "mkdir -p ${config:BUILD_PATH}; make clean; make -j$(nproc) && scp ${config:BUILD_PATH}/${config:PROGRAM} root@${config:TARGET_IP}:${config:REMOTE_DIR} && ssh root@${config:TARGET_IP} ${config:REMOTE_DIR}/${config:PROGRAM}",
+			"command": "mkdir -p ${config:BUILD_PATH}; make clean; make && scp ${config:BUILD_PATH}/${config:PROGRAM} root@${config:TARGET_IP}:${config:REMOTE_DIR} && ssh root@${config:TARGET_IP} ${config:REMOTE_DIR}/${config:PROGRAM}",
 			"problemMatcher": ["$gcc"],
 			"group": {
 				"kind": "build",
 				"isDefault": false
 			}
 		},
+
 			/* Cross-compile for i.MX */
 		{
 			"label": "cross-compile-i.MX",
 			"type": "shell",
-			"command": "source ${config:YOCTO_ENVIRONMENT}; set sysroot ${config:SDKTARGETSYSROOT}; make -j $(nproc)",
+			"command": "source ${config:YOCTO_ENVIRONMENT}; set sysroot ${config:SDKTARGETSYSROOT}; make",
 			"problemMatcher": ["$gcc"],
 			"group": {
 				"kind": "build",
@@ -67,7 +68,7 @@
 		{
 			"label": "cross-compile-and-upload-to-i.MX",
 			"type": "shell",
-			"command": "source ${config:YOCTO_ENVIRONMENT}; set sysroot ${config:SDKTARGETSYSROOT}; make -j $(nproc) && scp ${config:PROGRAM} ${config:REMOTE_USER}@${config:TARGET_IP}:${config:REMOTE_DIR}",
+			"command": "source ${config:YOCTO_ENVIRONMENT}; set sysroot ${config:SDKTARGETSYSROOT}; make && scp ${config:PROGRAM} ${config:REMOTE_USER}@${config:TARGET_IP}:${config:REMOTE_DIR}",
 			"problemMatcher": ["$gcc"],
 			"group": {
 				"kind": "build",
@@ -78,7 +79,7 @@
 		{
 			"label": "cross-compile-upload-to-i.MX-and-restart-i.MX",
 			"type": "shell",
-			"command": "source ${config:YOCTO_ENVIRONMENT}; set sysroot ${config:SDKTARGETSYSROOT}; make -j $(nproc) && scp ${config:PROGRAM} ${config:REMOTE_USER}@${config:TARGET_IP}:${config:REMOTE_DIR} && ssh ${config:REMOTE_USER}@${config:TARGET_IP} 'reboot &'",
+			"command": "source ${config:YOCTO_ENVIRONMENT}; set sysroot ${config:SDKTARGETSYSROOT}; make && scp ${config:PROGRAM} ${config:REMOTE_USER}@${config:TARGET_IP}:${config:REMOTE_DIR} && ssh ${config:REMOTE_USER}@${config:TARGET_IP} 'reboot &'",
 			"problemMatcher": ["$gcc"],
 			"group": {
 				"kind": "build",
